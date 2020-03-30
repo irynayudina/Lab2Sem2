@@ -1,6 +1,27 @@
 ﻿#include <iostream>
 #include <iomanip>
+#include <limits>
 using namespace std;
+
+
+/*
+Юдіна Ірина
+ПЗ-19-2
+Лабораторна 2
+Варіант 26
+Умова: 
+1. Дана прямоугольная матрица вещественных чисел.
+Найти последний минимальный элемент при просмотре матрицы по строкам. 
+Изъять (путем уплотнения) строку и столбец, на пересечении которых 
+находится минимальный элемент, и получить матрицу размером (m-1)*(n-1),
+а последние строку и столбец заполнить нулями. Вывести исходную матрицу,
+минимальный элемент, его индексы, новую матрицу.
+2. Дана дійсна прямокутна матриця розміру m x n: а[i][j], i=1,2,...,m; j=1,2,...,n.
+Утворити вектор “важливих” елементів матриці А і визначити k - їх кількість. 
+Вважати елемент “важливим”, якщо він менше суми решти елементів свого рядка.
+*/
+
+
 void printMatrix(double** arr, int m, int n) {
 	for (int i = 0; i < m; i++) {
 		for (int j = 0; j < n; j++) {
@@ -13,14 +34,14 @@ void printMatrix(double** arr, int m, int n) {
 void printMatrix2(double* arr, const int m, const int n) {
 	for (int i = 0; i < m; i++) {
 		for (int j = 0; j < n; j++) {
-			cout << setprecision(3) << *(arr + i*m +j) << "  ";
+			cout << setprecision(3) << *(arr + i*n +j) << "  "; 
 		}
 		cout << endl;
 	}
 }
 //поиск минимального елемента в 1 задании
 double minElement(double** arr, int m, int n, int* x, int* y) {
-	double min = 1000000;
+	double min = numeric_limits<double>::max();//1000000;
 	for (int i = 0; i < m; i++) {
 		for (int j = 0; j < n; j++) {
 			if (arr[i][j] <= min) {
@@ -33,12 +54,12 @@ double minElement(double** arr, int m, int n, int* x, int* y) {
 	}
 	return min;
 }
-//поиск значимого элемента в 2 задании
+//поиск значимого элемента в 2 задании с использованием приведенного индекса
 void valuableElement(double* a, const int m, const int n, double* sums, double* valuableElements) {
 	for (int i = 0; i < m; i++) {
 		for (int j = 0; j < n; j++) {
 			if (*(a + i * n + j) <= sums[i]) {
-				valuableElements[i*m +j] = *(a + i * n + j);				
+				valuableElements[i*n +j] = *(a + i * n + j);				
 			}
 		}
 	}
@@ -47,14 +68,14 @@ void valuableElement(double* a, const int m, const int n, double* sums, double* 
 void sum(double* a, const int m, const int n, double* sums) {
 	for (int i = 0; i < m; i++) {
 		for (int j = 0; j < n; j++) {
-			sums[i] += *(a + i * n + j);
+			sums[i] += a[i*n + j];//*(a + i * n + j);
 		}
 	}
 }
 //выводит на экран вектор из важных элементов
 void printVector(double* a, const int m) {
 	for (int i = 0; i < m; i++) {
-		if (a[i] != 1000000) {
+		if (a[i] != numeric_limits<double>::max()) {
 			cout << a[i] << " ";
 		}		
 	}
@@ -64,7 +85,7 @@ void printVector(double* a, const int m) {
 int valElCount(double* a, const int m) {
 	int c = 0;
 	for (int i = 0; i < m; i++) {
-		if (a[i] != 1000000) {
+		if (a[i] != numeric_limits<double>::max()) {
 			c +=1;
 		}
 	}
@@ -104,11 +125,13 @@ void ChangeMatrix(double** arr, int m, int n, int x, int y) {
 int main()
 {
 	cout << "Array of random numbers" << endl;
-	C:
-	cout << "Choose difficulty level(1 or 2):" << endl;
-	int d = 1;
-	int m, n;
-	cin >> d;	
+	int d = 0;
+	//чтобы пользовватель выбрал 1 или 2 задание
+	while (d != 1 && d != 2) {
+		cout << "Choose difficulty level(1 or 2):" << endl;
+		cin >> d;
+	}	
+	int m, n;	
 	cout << "Enter integer value of heigth(m) of matrix: " << endl;
 	cin >> m;
 	cout << "Enter integer value of width(n) of matrix: " << endl;
@@ -123,7 +146,7 @@ int main()
 		}
 		for (int i = 0; i < m; i++) {
 			for (int j = 0; j < n; j++) {
-				cout << "Enter any integer number" << endl;
+				cout << "Enter any double number" << endl;
 				cin >> inputMatrix[i][j];
 			}
 
@@ -148,8 +171,8 @@ int main()
 		double* a = (double*)malloc(m * n * sizeof(double));
 		for (int i = 0; i < m; i++) {
 			for (int j = 0; j < n; j++) {
-				cout << "Enter any integer number" << endl;
-				cin >> *(a+i*m+j);
+				cout << "Enter any double number" << endl;
+				cin >> *(a+i*n+j);
 			}
 		}
 		printMatrix2(a, m, n);
@@ -159,7 +182,7 @@ int main()
 		}
 		double* valuableElements = (double*)malloc(m * n * sizeof(double));
 		for (int o = 0; o < m*n; o++) {
-			valuableElements[o] = 1000000;
+			valuableElements[o] = numeric_limits<double>::max();
 		}
 		
 		sum(a, m, n, sums);
@@ -172,5 +195,4 @@ int main()
 		free(a);
 		free(sums);
 	}
-	else goto C;//чтобы пользовватель выбрал 1 или 2 задание
 }
